@@ -44,7 +44,7 @@ def load_vgg(sess, vgg_path):
     vgg_tensors = tuple([graph.get_tensor_by_name(tensor_name) for tensor_name in vgg_tensor_names])
     return vgg_tensors
 
-tests.test_load_vgg(load_vgg, tf)
+#tests.test_load_vgg(load_vgg, tf)
 
 
 def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
@@ -93,7 +93,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
                                                 padding='SAME', name="trn_6")
 
     return final_layer
-tests.test_layers(layers)
+#tests.test_layers(layers)
 
 
 def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
@@ -121,15 +121,16 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     # Training
     trainable_vars = []
 
-    # for variable in tf.trainable_variables():
-    #     if "trn" in variable.name or 'beta' in variable.name:
-    #         trainable_vars.append(variable)
-    # training_op = optimizer.minimize(loss_op, var_list=trainable_vars)
+    for variable in tf.trainable_variables():
+        if "trn" in variable.name or 'beta' in variable.name:
+            trainable_vars.append(variable)
+    training_op = optimizer.minimize(loss_op, var_list=trainable_vars)
 
-    training_op = optimizer.minimize(loss_op)
+    #training_op = optimizer.minimize(loss_op)
+
     return logits, training_op, loss_op
 
-tests.test_optimize(optimize)
+#tests.test_optimize(optimize)
 
 
 def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
@@ -163,7 +164,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                 print('Loss: ' + str(loss))
             except StopIteration:
                 break
-tests.test_train_nn(train_nn)
+#tests.test_train_nn(train_nn)
 
 def save_model(sess):
 
