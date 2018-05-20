@@ -159,9 +159,9 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                                     input_image: X_batch,
                                     correct_label: y_batch,
                                     keep_prob: keep_prob,       
-                                    learning_rate: learning_rate
-                                    })
-        print('Loss:', loss)
+                                    learning_rate: learning_rate})
+
+            print('Loss:', loss)
             except StopIteration:
                 break
 tests.test_train_nn(train_nn)
