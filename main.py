@@ -82,9 +82,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
                                             kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     # Skip Layer, 4 -> 7
-    skip_layer1 = tf.add(upsampled_vgg_layer7, conv1_layer4_pool, name="trn_3",
-                                            kernel_initializer=tf.random_normal_initializer(stddev=0.01),
-                                            kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+    skip_layer1 = tf.add(upsampled_vgg_layer7, conv1_layer4_pool, name="trn_3")
 
     # Upsample the Skip Layer x2
     upsampled_skip_layer1 = tf.layers.conv2d_transpose(skip_layer1, 2, (3,3), (2,2),
@@ -97,10 +95,13 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
                                             padding='SAME', name="trn_5",
                                             kernel_initializer=tf.random_normal_initializer(stddev=0.01),
                                             kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+
+    # Skip Layer 2
+    skip_layer2 = tf.add(upsampled_skip_layer1, conv2_layer3_pool, name="trn_6")
     
     # Upsample x8 to match the input dimensions
-    final_layer = tf.layers.conv2d_transpose(conv2_layer3_pool, 2, (13, 13), (8, 8),
-                                            padding='SAME', name="trn_6",
+    final_layer = tf.layers.conv2d_transpose(skip_layer2, 2, (13, 13), (8, 8),
+                                            padding='SAME', name="trn_7",
                                             kernel_initializer=tf.random_normal_initializer(stddev=0.01),
                                             kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
