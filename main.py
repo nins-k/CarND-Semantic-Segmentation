@@ -44,7 +44,7 @@ def load_vgg(sess, vgg_path):
     vgg_tensors = tuple([graph.get_tensor_by_name(tensor_name) for tensor_name in vgg_tensor_names])
     return vgg_tensors
 
-#tests.test_load_vgg(load_vgg, tf)
+tests.test_load_vgg(load_vgg, tf)
 
 
 def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
@@ -93,7 +93,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
                                                 padding='SAME', name="trn_6")
 
     return final_layer
-#tests.test_layers(layers)
+tests.test_layers(layers)
 
 
 def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
@@ -157,12 +157,12 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                 input_image: X_batch,
                 correct_label: y_batch,
                 keep_prob: 0.5,
-                learning_rate: 0.0005
+                learning_rate: 0.001
             })
 
         print('Loss: ' + str(loss))
      
-#tests.test_train_nn(train_nn)
+tests.test_train_nn(train_nn)
 
 def save_model(sess):
 
@@ -183,7 +183,7 @@ def run():
 
     correct_label = tf.placeholder(tf.float32, (None, None, None, num_classes))
     learning_rate = tf.placeholder(tf.float32)
-    epochs = 50
+    epochs = 75
     batch_size = 16
     
     # Download pretrained vgg model
