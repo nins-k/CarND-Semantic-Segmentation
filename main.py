@@ -158,7 +158,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                                     input_image: X_batch,
                                     correct_label: y_batch,
                                     keep_prob: keep_prob,       
-                                    learning_rate: learning_rate})
+                                    learning_rate: 0.005})
 
                 print('Loss: ' + str(loss))
             except StopIteration:
@@ -183,7 +183,7 @@ def run():
     tests.test_for_kitti_dataset(data_dir)
 
     correct_label = tf.placeholder(tf.float32, (None, None, None, num_classes))
-    learning_rate = 0.005
+    learning_rate = tf.placeholder(tf.float32)
     epochs = 10
     batch_size = 24
     
