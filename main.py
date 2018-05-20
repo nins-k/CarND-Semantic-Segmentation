@@ -64,8 +64,6 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     vgg_layer4_out = tf.stop_gradient(vgg_layer4_out)
     vgg_layer3_out = tf.stop_gradient(vgg_layer3_out)
 
-        
-    
     # Scaling
     vgg_layer3_out = tf.multiply(vgg_layer3_out, 0.0001, name='new_pool3_out_scaled')
     vgg_layer4_out = tf.multiply(vgg_layer4_out, 0.01, name='new_pool4_out_scaled')
@@ -73,25 +71,38 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
 
     # Upsampling Layer 7 x2
     upsampled_vgg_layer7 = tf.layers.conv2d_transpose(vgg_layer7_out, 2, (3,3), (2,2),
-                                                            padding='SAME', name="trn_1")
+                                            padding='SAME', name="trn_1",
+                                            kernel_initializer=tf.random_normal_initializer(stddev=0.01),
+                                            kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
+
     # Match the depth of Layer 4 pooling out
     conv1_layer4_pool = tf.layers.conv2d(vgg_layer4_out, 2, (1,1), (1,1), 
-                                            padding='SAME', name="trn_2")
+                                            padding='SAME', name="trn_2",
+                                            kernel_initializer=tf.random_normal_initializer(stddev=0.01),
+                                            kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     # Skip Layer, 4 -> 7
-    skip_layer1 = tf.add(upsampled_vgg_layer7, conv1_layer4_pool, name="trn_3")
+    skip_layer1 = tf.add(upsampled_vgg_layer7, conv1_layer4_pool, name="trn_3",
+                                            kernel_initializer=tf.random_normal_initializer(stddev=0.01),
+                                            kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     # Upsample the Skip Layer x2
     upsampled_skip_layer1 = tf.layers.conv2d_transpose(skip_layer1, 2, (3,3), (2,2),
-                                padding='SAME', name="trn_4")
+                                            padding='SAME', name="trn_4",
+                                            kernel_initializer=tf.random_normal_initializer(stddev=0.01),
+                                            kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     
     # Match the depth of the Layer 3 pooling out
     conv2_layer3_pool = tf.layers.conv2d(vgg_layer3_out, 2, (1,1), (1,1),
-                                padding='SAME', name="trn_5")
+                                            padding='SAME', name="trn_5",
+                                            kernel_initializer=tf.random_normal_initializer(stddev=0.01),
+                                            kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
     
     # Upsample x8 to match the input dimensions
     final_layer = tf.layers.conv2d_transpose(conv2_layer3_pool, 2, (13, 13), (8, 8),
-                                                padding='SAME', name="trn_6")
+                                            padding='SAME', name="trn_6",
+                                            kernel_initializer=tf.random_normal_initializer(stddev=0.01),
+                                            kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
     return final_layer
 tests.test_layers(layers)
@@ -111,8 +122,10 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     labels = tf.reshape(correct_label, (-1, num_classes))
 
     # Loss
-    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits = logits, labels=labels)
-    loss_op = tf.reduce_mean(cross_entropy)
+    cross_entropy_loss = tf.nn.softmax_cross_entropy_with_logits(logits = logits, labels=labels)
+    regularization_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
+    total_loss = tf.add_n([cross_entropy_loss] + regularization_losses, name="loss")
+    loss_op = tf.reduce_mean(total_loss)
 
     # Accuracy
 
