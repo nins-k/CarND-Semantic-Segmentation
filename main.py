@@ -65,11 +65,11 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     vgg_layer3_out = tf.stop_gradient(vgg_layer3_out)
 
         
-    '''
+    
     # Scaling
     vgg_layer3_out = tf.multiply(vgg_layer3_out, 0.0001, name='new_pool3_out_scaled')
     vgg_layer4_out = tf.multiply(vgg_layer4_out, 0.01, name='new_pool4_out_scaled')
-    '''
+    
 
     # Upsampling Layer 7 x2
     upsampled_vgg_layer7 = tf.layers.conv2d_transpose(vgg_layer7_out, 2, (3,3), (2,2),
