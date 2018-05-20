@@ -157,7 +157,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                 input_image: X_batch,
                 correct_label: y_batch,
                 keep_prob: 0.6,
-                learning_rate: 0.005
+                learning_rate: 0.001
             })
 
         print('Loss: ' + str(loss))
@@ -183,8 +183,8 @@ def run():
 
     correct_label = tf.placeholder(tf.float32, (None, None, None, num_classes))
     learning_rate = tf.placeholder(tf.float32)
-    epochs = 10
-    batch_size = 24
+    epochs = 34
+    batch_size = 32
     
     # Download pretrained vgg model
     # helper.maybe_download_pretrained_vgg(data_dir)
@@ -218,7 +218,7 @@ def run():
                     correct_label, keep_prob, learning_rate)
 
         # TODO: Save inference data using helper.save_inference_samples
-        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, 1, input_image)
+        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, 1, image_input)
 
         save_model(sess)
 
