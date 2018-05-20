@@ -183,7 +183,7 @@ def run():
     tests.test_for_kitti_dataset(data_dir)
 
     correct_label = tf.placeholder(tf.float32, (None, None, None, num_classes))
-    learning_rate = tf.placeholder(tf.float32)
+    learning_rate = 0.005
     epochs = 10
     batch_size = 24
     
