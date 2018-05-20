@@ -152,18 +152,16 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
 
     for epoch in range(epochs):
         print("Epoch: " + str(epoch))
-        while True:
-            try:
-                X_batch, y_batch = get_batches_fn(batch_size)
-                loss, _ = sess.run([cross_entropy_loss, train_op], feed_dict={
-                                    input_image: X_batch,
-                                    correct_label: y_batch,
-                                    keep_prob: 0.6,       
-                                    learning_rate: 0.005})
+        for X_batch , y_batch in get_batches_fn(batch_size):
+            loss, _ = sess.run([cross_entropy_loss, train_op], feed_dict={
+                input_image: X_batch,
+                correct_label: y_batch,
+                keep_prob: 0.6,
+                learning_rate: 0.005
+            })
 
-                print('Loss: ' + str(loss))
-            except StopIteration:
-                break
+        print('Loss: ' + str(loss))
+     
 #tests.test_train_nn(train_nn)
 
 def save_model(sess):
