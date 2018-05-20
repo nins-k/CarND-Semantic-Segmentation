@@ -158,7 +158,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                 loss, _ = sess.run([cross_entropy_loss, train_op], feed_dict={
                                     input_image: X_batch,
                                     correct_label: y_batch,
-                                    keep_prob: keep_prob,
+                                    keep_prob: keep_prob,       
                                     learning_rate: learning_rate
                                     })
         print('Loss:', loss)
@@ -185,9 +185,8 @@ def run():
 
     correct_label = tf.placeholder(tf.float32, (None, None, None, num_classes))
     learning_rate = tf.placeholder(tf.float32)
-    epochs = 2
-    batch_size = 8
-    keep_prob = 0.5
+    epochs = 10
+    batch_size = 24
     
     # Download pretrained vgg model
     # helper.maybe_download_pretrained_vgg(data_dir)
