@@ -198,7 +198,7 @@ def run():
 
     correct_label = tf.placeholder(tf.float32, (None, None, None, num_classes))
     learning_rate = tf.placeholder(tf.float32)
-    epochs = 70
+    epochs = 30
     batch_size = 16
     
     # Download pretrained vgg model
