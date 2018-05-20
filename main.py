@@ -125,7 +125,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     # Loss
     cross_entropy_loss = tf.nn.softmax_cross_entropy_with_logits(logits = logits, labels=labels)
     regularization_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
-    total_loss = tf.add_n([cross_entropy_loss] + regularization_losses, name="loss")
+    total_loss = 0.002*regularization_losses + cross_entropy_loss
     loss_op = tf.reduce_mean(total_loss)
 
     # Accuracy
