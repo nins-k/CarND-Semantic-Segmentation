@@ -107,9 +107,11 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     :return: Tuple of (logits, train_op, cross_entropy_loss)
     """
     # TODO: Implement function
+    logits = tf.reshape(nn_last_layer, (-1, num_classes))
+    labels = tf.reshape(correct_label, (-1, num_classes))
 
     # Loss
-    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits = nn_last_layer, labels=correct_label)
+    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits = logits, labels=labels)
     loss_op = tf.reduce_mean(cross_entropy)
 
     # Accuracy
@@ -121,16 +123,13 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     trainable_vars = []
 
     for variable in tf.trainable_variables():
-        print(variable.name)
         if "trn" in variable.name or 'beta' in variable.name:
             trainable_vars.append(variable)
-
     training_op = optimizer.minimize(loss_op, var_list=trainable_vars)
 
-    return nn_last_layer, training_op, loss_op
+    training_op = optimizer.minimize(loss_op)
+    return logits, training_op, loss_op
 
-
-    return None, None, None
 tests.test_optimize(optimize)
 
 
@@ -150,8 +149,31 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param learning_rate: TF Placeholder for learning rate
     """
     # TODO: Implement function
-    pass
+
+    for epoch in range(epochs):
+        print("Epoch: " + str(epoch))
+        while True:
+            try:
+                X_batch, y_batch = get_batches_fn(batch_size)
+                loss, _ = sess.run([cross_entropy_loss, train_op], feed_dict={
+                                    input_image: X_batch,
+                                    correct_label: y_batch,
+                                    keep_prob: 0.6,
+                                    learning_rate: 0.005
+                                    })
+        print('Loss:', loss)
+            except StopIteration:
+                break
 tests.test_train_nn(train_nn)
+
+def save_model(sess):
+
+    if "saved_model" in os.listdir(os.getcwd()):
+        shutil.rmtree("./saved_model")
+
+    builder = tf.saved_model.builder.SavedModelBuilder("./saved_model")
+    builder.add_meta_graph_and_variables(sess, ["vgg16"])
+    builder.save()
 
 
 def run():
@@ -162,7 +184,7 @@ def run():
     tests.test_for_kitti_dataset(data_dir)
 
     # Download pretrained vgg model
-    helper.maybe_download_pretrained_vgg(data_dir)
+    # helper.maybe_download_pretrained_vgg(data_dir)
 
     # OPTIONAL: Train and Inference on the cityscapes dataset instead of the Kitti dataset.
     # You'll need a GPU with at least 10 teraFLOPS to train on.
@@ -178,13 +200,24 @@ def run():
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
         # TODO: Build NN using load_vgg, layers, and optimize function
+        image_input, keep_prob, layer3_out, layer4_out, layer7_out = load_vgg(sess, vgg_path)
+        logits = layers(layer3_out, layer4_out, layer7_out, num_classes)
+        logits, train_op, cross_entropy_loss = optimize(logits, correct_label, learning_rate, num_classes)
+
+        my_variable_initializers = [ var.initializer for var in tf.global_variables() 
+                                        if 'trn' in var.name or 'beta' in var.name]
+   
+        sess.run(my_variable_initializers)
+
 
         # TODO: Train NN using the train_nn function
+        train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, image_input, 
+                    correct_label, keep_prob, learning_rate)
 
         # TODO: Save inference data using helper.save_inference_samples
-        #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
 
-        # OPTIONAL: Apply the trained model to a video
+        save_model(sess)
 
 
 if __name__ == '__main__':
