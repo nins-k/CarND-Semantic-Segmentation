@@ -121,10 +121,10 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     # Training
     trainable_vars = []
 
-    for variable in tf.trainable_variables():
-        if "trn" in variable.name or 'beta' in variable.name:
-            trainable_vars.append(variable)
-    training_op = optimizer.minimize(loss_op, var_list=trainable_vars)
+    # for variable in tf.trainable_variables():
+    #     if "trn" in variable.name or 'beta' in variable.name:
+    #         trainable_vars.append(variable)
+    # training_op = optimizer.minimize(loss_op, var_list=trainable_vars)
 
     training_op = optimizer.minimize(loss_op)
     return logits, training_op, loss_op
